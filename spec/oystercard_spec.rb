@@ -9,8 +9,12 @@ describe Oystercard do
 
   it {is_expected.to respond_to(:top_up).with(1).argument}
   it "tops up the oyster card" do
-    card.top_up(20)
-    expect(card.balance).to eq 20
+    expect{ card.top_up 20 }.to change{ card.balance }.by 20
   end
 
+  it "raises error if limit is exceeded" do
+    maximum = Oystercard::MAXIMUM_LIMIT
+    card.top_up maximum
+    expect{card.top_up(1)}.to raise_error "Balance exceeded maximum limit of #{Oystercard::MAXIMUM_LIMIT}"
+  end
 end
