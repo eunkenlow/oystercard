@@ -20,4 +20,20 @@ describe Oystercard do
   it "deducts fare from the card" do
     expect{ card.deduct 2.8 }.to change{ card.balance }.by -2.8
   end
+
+  it "is initially not in a journey" do
+    expect(card).not_to be_in_journey
+  end
+
+  it "touches in oyster card" do
+    card.touch_in
+    expect(card).to be_in_journey
+  end
+
+  it "touches out oyster card" do
+    card.touch_in
+    card.touch_out
+    expect(card).not_to be_in_journey
+  end
+
 end
