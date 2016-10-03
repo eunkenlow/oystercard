@@ -25,15 +25,25 @@ describe Oystercard do
     expect(card).not_to be_in_journey
   end
 
-  it "touches in oyster card" do
-    card.touch_in
-    expect(card).to be_in_journey
+  context "when card is topped up" do
+    before do
+      card.top_up Oystercard::MAXIMUM_LIMIT
+    end
+
+    it "touches in oyster card" do
+      card.touch_in
+      expect(card).to be_in_journey
+    end
+    it "touches out oyster card" do
+      card.touch_in
+      card.touch_out
+      expect(card).not_to be_in_journey
+    end
+
   end
 
-  it "touches out oyster card" do
-    card.touch_in
-    card.touch_out
-    expect(card).not_to be_in_journey
+  it "raises error if insufficient funds" do
+    expect{card.touch_in}.to raise_error "You have insufficient funds"
   end
 
 end
