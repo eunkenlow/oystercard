@@ -1,31 +1,41 @@
 require 'journey'
+require 'oystercard'
+require 'station'
+
 describe Journey do
-  subject (:journey) {described_class.new}
-  let(:start_station) {double :start_station}
-  let(:finish_station) {double :finish_station}
 
-  it "should start a journey" do
-    journey.start_journey(start_station)
-    expect(journey.start).to eq start_station
+  subject(:journey) {described_class.new}
+
+  describe '#initialize' do
+    it 'by default the current journey is empty' do
+      expect(journey.current_journey).to eq({entry_station: nil, entry_zone: nil,
+                                             exit_station: nil, exit_zone: nil})
+    end
   end
 
-  it "should finish a journey" do
-    journey.finish_journey(finish_station)
-    expect(journey.finish).to eq finish_station
+  describe "#fare" do
+    it "deducts the minimum fare for a complete single journey" do
+      journey.current_journey = {entry_station: "Waterloo", entry_zone: 1,
+                                 exit_station: "Euston", exit_zone: 1}
+      expect(journey.fare).to eq(1)
+    end
+
+    it "deducts the penalty fare for an incomplete journey" do
+      journey.current_journey = {entry_station: "Waterloo", entry_zone: 1,
+                                 exit_station: nil, exit_zone: nil}
+      expect(journey.fare).to eq(6)
+    end
+
+    context "different zone trip fares" do
+      it "2 pounds trip for moving one zone" do
+      journey.current_journey = {entry_station: "Waterloo", entry_zone: 1,
+                          exit_station: "Euston", exit_zone: 2}
+      expect(journey.fare).to eq(2)
+      end
+    end
   end
 
-  it "returns minimum fare for complete journey" do
-    journey.start_journey(start_station)
-    journey.finish_journey(finish_station)
-    expect(journey.fare).to eq Journey::MINIMUM_FARE
-  end
 
-  it "returns penalty fare for incomplete journey" do
-    journey.finish_journey(finish_station)
-    expect(journey.fare).to eq Journey::PENALTY_FARE
-  end
 
-  it "return error if no journey recorded" do
-    expect{journey.fare}.to raise_error ("no journey recorded")
-  end
+
 end
